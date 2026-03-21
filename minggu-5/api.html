@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kosajah API Reference</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #0b0f1a;
+        --bg2: #111827;
+        --bg3: #1a2235;
+        --border: rgba(255, 255, 255, 0.07);
+        --border2: rgba(255, 255, 255, 0.12);
+        --text: #f0f4ff;
+        --text2: #8b97b8;
+        --text3: #4e5b7a;
+        --accent: #4f7dff;
+        --accent2: #7b5ea7;
+        --glow: rgba(79, 125, 255, 0.15);
+
+        --get-bg: #0d2340;
+        --get-text: #60a5fa;
+        --get-border: rgba(96, 165, 250, 0.25);
+
+        --post-bg: #0d2b1a;
+        --post-text: #4ade80;
+        --post-border: rgba(74, 222, 128, 0.25);
+
+        --put-bg: #2b1d0a;
+        --put-text: #fb923c;
+        --put-border: rgba(251, 146, 60, 0.25);
+
+        --del-bg: #2b0d0d;
+        --del-text: #f87171;
+        --del-border: rgba(248, 113, 113, 0.25);
+
+        --auth-bg: rgba(124, 101, 255, 0.12);
+        --auth-text: #a78bfa;
+        --auth-border: rgba(124, 101, 255, 0.3);
+
+        --pub-bg: rgba(52, 211, 153, 0.1);
+        --pub-text: #34d399;
+        --pub-border: rgba(52, 211, 153, 0.3);
+
+        --sys-bg: rgba(251, 146, 60, 0.1);
+        --sys-text: #fb923c;
+        --sys-border: rgba(251, 146, 60, 0.3);
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Poppins", sans-serif;
+        font-weight: 300;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* Background grid */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: linear-gradient(rgba(79, 125, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(79, 125, 255, 0.03) 1px, transparent 1px);
+        background-size: 40px 40px;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      /* Glow blob */
+      body::after {
+        content: "";
+        position: fixed;
+        top: -200px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 800px;
+        height: 500px;
+        background: radial-gradient(ellipse, rgba(79, 125, 255, 0.08) 0%, transparent 70%);
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .container {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 60px 24px 100px;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Header */
+      .header {
+        margin-bottom: 56px;
+        animation: fadeUp 0.6s ease both;
+      }
+
+      .header-eyebrow {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .header-eyebrow::before {
+        content: "";
+        display: inline-block;
+        width: 24px;
+        height: 1.5px;
+        background: var(--accent);
+        border-radius: 2px;
+      }
+
+      .header h1 {
+        font-family: "Poppins", sans-serif;
+        font-size: clamp(32px, 5vw, 52px);
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1.05;
+        background: linear-gradient(135deg, #f0f4ff 20%, #8b97b8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 16px;
+      }
+
+      .header-sub {
+        font-size: 15px;
+        color: var(--text2);
+        line-height: 1.6;
+        max-width: 500px;
+      }
+
+      .base-url {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 20px;
+        background: var(--bg3);
+        border: 1px solid var(--border2);
+        border-radius: 10px;
+        padding: 10px 16px;
+      }
+
+      .base-label {
+        font-size: 11px;
+        color: var(--text3);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .base-url code {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        color: var(--get-text);
+      }
+
+      /* Legend */
+      .legend {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 48px;
+        animation: fadeUp 0.6s 0.1s ease both;
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--text2);
+      }
+
+      /* Module */
+      .module {
+        margin-bottom: 40px;
+        animation: fadeUp 0.5s ease both;
+      }
+
+      .module:nth-child(1) {
+        animation-delay: 0.15s;
+      }
+      .module:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .module:nth-child(3) {
+        animation-delay: 0.25s;
+      }
+      .module:nth-child(4) {
+        animation-delay: 0.3s;
+      }
+      .module:nth-child(5) {
+        animation-delay: 0.35s;
+      }
+      .module:nth-child(6) {
+        animation-delay: 0.4s;
+      }
+      .module:nth-child(7) {
+        animation-delay: 0.45s;
+      }
+      .module:nth-child(8) {
+        animation-delay: 0.5s;
+      }
+
+      .module-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .module-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        flex-shrink: 0;
+        background: var(--bg3);
+        border: 1px solid var(--border2);
+      }
+
+      .module-title {
+        font-family: "Poppins", sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--text);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      .module-count {
+        margin-left: auto;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10px;
+        color: var(--text3);
+        background: var(--bg3);
+        padding: 3px 8px;
+        border-radius: 20px;
+        border: 1px solid var(--border);
+      }
+
+      /* Endpoint */
+      .endpoint {
+        display: grid;
+        grid-template-columns: 58px 1fr auto;
+        align-items: center;
+        gap: 14px;
+        padding: 13px 16px;
+        border-radius: 10px;
+        margin-bottom: 5px;
+        background: var(--bg2);
+        border: 1px solid var(--border);
+        transition: all 0.2s ease;
+        cursor: default;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .endpoint::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        border-radius: 2px 0 0 2px;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+
+      .endpoint:hover {
+        border-color: var(--border2);
+        background: var(--bg3);
+        transform: translateX(2px);
+      }
+
+      .endpoint:hover::before {
+        opacity: 1;
+      }
+
+      .endpoint.has-get::before {
+        background: var(--get-text);
+      }
+      .endpoint.has-post::before {
+        background: var(--post-text);
+      }
+      .endpoint.has-put::before {
+        background: var(--put-text);
+      }
+      .endpoint.has-delete::before {
+        background: var(--del-text);
+      }
+
+      /* Method badge */
+      .method {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 4px 0;
+        border-radius: 6px;
+        text-align: center;
+        letter-spacing: 0.06em;
+        border: 1px solid;
+      }
+
+      .GET {
+        background: var(--get-bg);
+        color: var(--get-text);
+        border-color: var(--get-border);
+      }
+      .POST {
+        background: var(--post-bg);
+        color: var(--post-text);
+        border-color: var(--post-border);
+      }
+      .PUT {
+        background: var(--put-bg);
+        color: var(--put-text);
+        border-color: var(--put-border);
+      }
+      .DELETE {
+        background: var(--del-bg);
+        color: var(--del-text);
+        border-color: var(--del-border);
+      }
+
+      .path-desc {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        min-width: 0;
+      }
+
+      .path {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 13px;
+        color: var(--text);
+        font-weight: 500;
+      }
+
+      .path .param {
+        color: var(--accent);
+        opacity: 0.85;
+      }
+
+      .desc {
+        font-size: 12px;
+        color: var(--text2);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-weight: 300;
+      }
+
+      /* Access badge */
+      .badge {
+        font-size: 10px;
+        font-weight: 500;
+        padding: 3px 9px;
+        border-radius: 20px;
+        white-space: nowrap;
+        border: 1px solid;
+        letter-spacing: 0.04em;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .badge.auth {
+        background: var(--auth-bg);
+        color: var(--auth-text);
+        border-color: var(--auth-border);
+      }
+      .badge.pub {
+        background: var(--pub-bg);
+        color: var(--pub-text);
+        border-color: var(--pub-border);
+      }
+      .badge.sys {
+        background: var(--sys-bg);
+        color: var(--sys-text);
+        border-color: var(--sys-border);
+      }
+
+      /* Stats bar */
+      .stats {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 48px;
+        flex-wrap: wrap;
+        animation: fadeUp 0.6s 0.05s ease both;
+      }
+
+      .stat-item {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .stat-num {
+        font-family: "Poppins", sans-serif;
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--text);
+        line-height: 1;
+      }
+
+      .stat-num span {
+        font-size: 16px;
+        color: var(--accent);
+      }
+
+      .stat-label {
+        font-size: 12px;
+        color: var(--text3);
+      }
+
+      .stat-divider {
+        width: 1px;
+        background: var(--border2);
+        margin: 4px 0;
+        align-self: stretch;
+      }
+
+      /* Animation */
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Responsive */
+      @media (max-width: 560px) {
+        .endpoint {
+          grid-template-columns: 52px 1fr;
+        }
+        .endpoint .badge {
+          display: none;
+        }
+        .stats {
+          gap: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <div class="header">
+        <div class="header-eyebrow">API Reference</div>
+        <h1>Kosajah API</h1>
+        <p class="header-sub">Dokumentasi lengkap endpoint REST API untuk platform pencarian dan pemesanan kos.</p>
+        <div class="base-url">
+          <span class="base-label">Base URL</span>
+          <code>https://kosajah.com/api</code>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats">
+        <div class="stat-item">
+          <div class="stat-num">28<span> ep</span></div>
+          <div class="stat-label">Total Endpoint</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-num">7</div>
+          <div class="stat-label">Modul</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-num" style="color: var(--pub-text)">7</div>
+          <div class="stat-label">Public</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-num" style="color: var(--auth-text)">20</div>
+          <div class="stat-label">Auth Required</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-num" style="color: var(--sys-text)">1</div>
+          <div class="stat-label">System</div>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend">
+        <span class="legend-item"><span class="badge pub">public</span> Tanpa login</span>
+        <span class="legend-item"><span class="badge auth">auth</span> Perlu login</span>
+        <span class="legend-item"><span class="badge sys">system</span> Dipanggil sistem/webhook</span>
+      </div>
+
+      <!-- AUTENTIKASI -->
+      <div class="module">
+        <div class="module-header">
+          <div class="module-icon">🔑</div>
+          <div class="module-title">Autentikasi</div>
+          <div class="module-count">6 endpoints</div>
+        </div>
+        <div class="endpoint has-post">
+          <span class="method POST">POST</span>
+          <div class="path-desc"><span class="path">/auth/register</span><span class="desc">Daftar akun baru pencari kos</span></div>
+          <span class="badge pub">public</span>
+        </div>
+        <div class="endpoint has-post">
+          <span class="method POST">POST</span>
+          <div class="path-desc"><span class="path">/auth/login</span><span class="desc">Login dan dapatkan JWT token</span></div>
+          <span class="badge pub">public</span>
+        </div>
+        <div class="endpoint has-post">
+          <span class="method POST">POST</span>
+          <div class="path-desc"><span class="path">/auth/logout</span><span class="desc">Logout dan invalidasi sesi</span></div>
+          <span class="badge auth">auth</span>
+        </div>
+        <div class="endpoint has-post">
+          <span class="method POST">POST</span>
+          <div class="path-desc"><span class="path">/auth/refresh</span><span class="desc">Perbarui access token dengan refresh token</span></div>
+          <span class="badge auth">auth</span>
+        </div>
+        <div class="endpoint has-post">
+          <span class="method POST">POST</span>
+          <div class="path-desc"><span class="path">/auth/forgot-password</span><span class="desc">Kirim email reset password</span></div>
+          <span class="badge pub">public</span>
+        </div>
+        <div class="endpoint has-post">
+          <span class="method POST">POST</span>
+          <div class="path-desc"><span class="path">/auth/reset-password</span><span class="desc">Reset password dengan token dari email</span></div>
+          <span class="badge pub">public</span>
+        </div>
+      </div>
+
+      <!-- PROFIL -->
+      <div class="module">
+        <div class="module-header">
+          <div class="module-icon">👤</div>
+          <div class="module-title">Profil Pengguna</div>
+          <div class="module-count">3 endpoints</div>
+        </div>
+        <div class="endpoint has-get">
+          <span class="method GET">GET</span>
+          <div class="path-desc"><span class="path">/profile</span><span class="desc">Ambil data profil pengguna yang sedang login</span></div>
+          <span class="badge auth">auth</span>
+        </div>
+        <div class="endpoint has-put">
+          <span class="method PUT">PUT</span>
+          <div class="path-desc"><span class="path">/profile</span><span class="desc">Perbarui nama, nomor WhatsApp, dan foto profil</span></div>
+          <span class="badge auth">auth</span>
+        </div>
+        <div class="endpoint has-put">
+          <span class="method PUT">PUT</span>
+          <div class="path-desc"><span class="path">/profile/password</span><span class="desc">Ganti password pengguna</span></div>
+          <span class="badge auth">auth</span>
+        </div>
+      </div>
+
+      <!-- PENCARIAN KOS -->
+      <div class="module">
+        <div class="module-header">
+          <div class="module-icon">🔍</div>
+          <div class="module-title">Pencarian &amp; Detail Kos</div>
+          <div class="module-count">5 endpoints</div>
+        </div>
+        <div class="endpoint has-get">
+          <span class="method GET">GET</span>
+          <div class="path-desc"><span class="path">/kos</span><span class="desc">Ambil daftar kos dengan filter kota, harga, fasilitas</span></div>
+          <span class="badge pub">public</span>
+        </div>
+        <div class="endpoint has-get">
+          <span class="method GET">GET</span>
+          <div class="path-desc">
+            <span class="path">/kos/<span class="param">:id</span></span
+            ><span class="desc">Ambil detail kos beserta foto dan daftar kamar</span>
+          </div>
+          <span class="badge pub">public</span>
+        </div>
+        <div class="endpoint has-get">
+          <span class="method GET">GET</span>
+          <div class="path-desc">
+            <span class="path">/kos/<span class="param">:id</span>/kamar</span><span class="desc">Ambil semua kamar dalam satu kos beserta stok</span>
+          </div>
+          <span class="badge pub">public</span>
+        </div>
+        <div class="endpoint has-get">
+          <span class="method GET">GET</span>
+          <div class="path-desc">
+            <span class="path">/kos/<span class="param">:id</span>/review</span><span class="desc">Ambil semua review dan rating untuk satu kos</span>
+          </div>
+          <span class="badge pub">public</span>
+        </div>
+        <div class="endpoint has-get">
+          <span class="method GET">GET</span>
+          <div class="path-desc"><span class="path">/kos/nearby</span><span class="desc">Cari kos terdekat berdasarkan koordinat GPS (lat, lng)</span></div>
+          <span class="badge pub">public</span>
+        </div>
+      </div>
+
+      <!-- BOOKING -->
+      <div class="module">
+        <div class="module-header">
+          <div class="module-icon">📋</div>
+          <div class="module-title">Booking Kamar</div>
+          <div class="module-count">4 endpoints</div>
+        </div>
+        <div class="endpoint has-post">
+          <span class="method POST">POST</span>
+          <div class="path-desc"><span class="path">/booking</span><span class="desc">Buat booking baru, cek stok, simpan dengan status PENDING</span></div>
+          <span class="badge auth">auth</span>
+        </div>
+        <div class="endpoint has-get">
+          <span class="method GET">GET</span>
+          <div class="path-desc"><span class="path">/booking</span><span class="desc">Ambil semua riwayat booking milik pengguna yang login</span></div>
+          <span class="badge auth">auth</span>
+        </div>
+        <div class="endpoint has-get">
+          <span class="method GET">GET</span>
+          <div class="path-desc">
+            <span class="path">/booking/<span class="param">:id</span></span
+            ><span class="desc">Ambil detail satu booking beserta status pembayaran</span>
+          </div>
+          <span class="badge auth">auth</span>
+        </div>
+        <div class="endpoint has-put">
+          <span class="method PUT">PUT</span>
+          <div class="path-desc">
+            <span class="path">/booking/<span class="param">:id</span>/cancel</span><span class="desc">Batalkan booking yang masih berstatus PENDING</span>
+          </div>
+          <span class="badge auth">auth</span>
+        </div>
+      </div>
+
+      <!-- PEMBAYARAN -->
+      <div class="module">
+        <div class="module-header">
+          <div class="module-icon">💳</div>
+          <div class="module-title">Pembayaran Midtrans</div>
+          <div class="module-count">3 endpoints</div>
+        </div>
+        <div class="endpoint has-post">
+          <span class="method POST">POST</span>
+          <div class="path-desc">
+            <span class="path">/payment/<span class="param">:booking_id</span>/create</span><span class="desc">Buat transaksi Midtrans, kembalikan Snap Token ke frontend</span>
+          </div>
+          <span class="badge auth">auth</span>
+        </div>
+        <div class="endpoint has-get">
+          <span class="method GET">GET</span>
+          <div class="path-desc">
+            <span class="path">/payment/<span class="param">:booking_id</span>/status</span><span class="desc">Cek status pembayaran transaksi</span>
+          </div>
+          <span class="badge auth">auth</span>
+        </div>
+        <div class="endpoint has-post">
+          <span class="method POST">POST</span>
+          <div class="path-desc"><span class="path">/payment/webhook</span><span class="desc">Terima callback dari Midtrans, update status booking &amp; transaksi</span></div>
+          <span class="badge sys">system</span>
+        </div>
+      </div>
+
+      <!-- FAVORIT -->
+      <div class="module">
+        <div class="module-header">
+          <div class="module-icon">❤️</div>
+          <div class="module-title">Favorit Kos</div>
+          <div class="module-count">3 endpoints</div>
+        </div>
+        <div class="endpoint has-get">
+          <span class="method GET">GET</span>
+          <div class="path-desc"><span class="path">/favorites</span><span class="desc">Ambil daftar kos yang difavoritkan pengguna</span></div>
+          <span class="badge auth">auth</span>
+        </div>
+        <div class="endpoint has-post">
+          <span class="method POST">POST</span>
+          <div class="path-desc">
+            <span class="path">/favorites/<span class="param">:kos_id</span></span
+            ><span class="desc">Tambahkan kos ke daftar favorit</span>
+          </div>
+          <span class="badge auth">auth</span>
+        </div>
+        <div class="endpoint has-delete">
+          <span class="method DELETE">DELETE</span>
+          <div class="path-desc">
+            <span class="path">/favorites/<span class="param">:kos_id</span></span
+            ><span class="desc">Hapus kos dari daftar favorit</span>
+          </div>
+          <span class="badge auth">auth</span>
+        </div>
+      </div>
+
+      <!-- REVIEW -->
+      <div class="module">
+        <div class="module-header">
+          <div class="module-icon">⭐</div>
+          <div class="module-title">Rating &amp; Review</div>
+          <div class="module-count">3 endpoints</div>
+        </div>
+        <div class="endpoint has-post">
+          <span class="method POST">POST</span>
+          <div class="path-desc">
+            <span class="path">/review/<span class="param">:kos_id</span></span
+            ><span class="desc">Tulis review &amp; rating — hanya bisa jika pernah booking</span>
+          </div>
+          <span class="badge auth">auth</span>
+        </div>
+        <div class="endpoint has-put">
+          <span class="method PUT">PUT</span>
+          <div class="path-desc">
+            <span class="path">/review/<span class="param">:review_id</span></span
+            ><span class="desc">Edit review yang sudah ditulis</span>
+          </div>
+          <span class="badge auth">auth</span>
+        </div>
+        <div class="endpoint has-delete">
+          <span class="method DELETE">DELETE</span>
+          <div class="path-desc">
+            <span class="path">/review/<span class="param">:review_id</span></span
+            ><span class="desc">Hapus review milik pengguna</span>
+          </div>
+          <span class="badge auth">auth</span>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
